@@ -1,0 +1,215 @@
+---
+title: "Group 2 Assignment 3"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+    responsive: true
+---
+
+
+
+
+```{r setup, include=FALSE}
+#libraries
+library(flexdashboard) # run the flexdashboard functionality
+library(tidyverse)
+library(plotly)
+library(DT)
+#library(ggplot)
+
+
+
+#data prepping
+
+##load data
+salaries <- read.csv('ds_salaries_full.csv')
+
+##Sort experience levels
+salaries$experience_level <- factor(salaries$experience_level, levels = c("EN", "MI", "SE", "EX"), labels = c("Entry", "Middle", "Senior", "Executive"))
+
+##Add country helper labels
+europe <- c("AT", "BE", "BG", "CH", "CZ", "DE", "DK", "EE", "ES", "FR", "GB", "GR", "HR", "HU", "IE", "IT", "LU", "MT", "NL", "PL", "PT", "RO", "RS", "SI", "TR", "UA")
+
+salaries <- salaries %>% 
+  mutate(
+    continent_helper = case_when(
+      employee_residence %in% europe ~ "Europe",
+      employee_residence == "US" ~ "United States",
+      employee_residence == "CA" ~ "Canada",
+      TRUE ~ "Other"
+    )
+  )
+
+salaries$continent_helper <- as.factor(salaries$continent_helper)
+salaries$job_group        <- as.factor(salaries$job_group)
+
+```
+
+Salaries
+===
+
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+
+### Salary by experience
+
+```{r}
+# ENtry, MId, SEnior, EXecutive
+p_experience <- ggplot(salaries, aes(x = experience_level, y = salary_in_usd)) +
+  geom_point() +
+  labs(x = "Experience Level", y = "Salary in USD") +
+  scale_y_continuous(labels = scales::comma_format(scale = 1, big.mark = ","), limits = c(0, 650000))
+
+ggplotly(p_experience)
+
+
+```
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+
+### Salary by location
+
+```{r}
+p_location <- ggplot(salaries[salaries$continent_helper != "Other",], aes(x = continent_helper, y = salary_in_usd), color = salary_in_usd) +
+  geom_point() +
+  labs(x = "Continent/Country", y = "Salary in USD") +
+  scale_y_continuous(labels = scales::comma_format(scale = 1, big.mark = ","), limits = c(0, 650000)) +
+  scale_color_gradient(low = "blue", high = "red")
+
+ggplotly(p_location)
+
+
+
+```
+
+
+Remote Work Rates
+===
+
+Column {data-width=200}
+-----------------------------------------------------------------------
+
+
+### 2020
+
+```{r}
+# Filter data for the year 2020
+df_2020 <- salaries[salaries$work_year == 2020, ]
+
+# Calculate the total number of employees for 2020
+total_2020 <- nrow(df_2020)
+
+# Calculate the percentage of employees in each remote work category
+no_remote_2020_percent   <- nrow(df_2020[df_2020$remote_ratio == 0  , ]) / total_2020 * 100
+some_remote_2020_percent <- nrow(df_2020[df_2020$remote_ratio == 50 , ]) / total_2020 * 100
+full_remote_2020_percent <- nrow(df_2020[df_2020$remote_ratio == 100, ]) / total_2020 * 100
+
+# Create individual gauge charts for each remote work category with labels
+gauge(no_remote_2020_percent, min = 0, max = 100, symbol = '%', label = "No Remote")
+gauge(some_remote_2020_percent, min = 0, max = 100, symbol = '%', label = "Some Remote")
+gauge(full_remote_2020_percent, min = 0, max = 100, symbol = '%', label = "Fully Remote")
+
+# Clean up intermediate variables
+rm(no_remote_2020_percent, some_remote_2020_percent, full_remote_2020_percent)
+
+```
+
+Column {data-width=200}
+-----------------------------------------------------------------------
+
+### 2021
+
+```{r}
+# Filter data for the year 2021
+df_2021 <- salaries[salaries$work_year == 2021, ]
+
+# Calculate the total number of employees for 2021
+total_2021 <- nrow(df_2021)
+
+# Calculate the percentage of employees in each remote work category for 2021
+no_remote_2021_percent   <- nrow(df_2021[df_2021$remote_ratio == 0  , ]) / total_2021 * 100
+some_remote_2021_percent <- nrow(df_2021[df_2021$remote_ratio == 50 , ]) / total_2021 * 100
+full_remote_2021_percent <- nrow(df_2021[df_2021$remote_ratio == 100, ]) / total_2021 * 100
+
+# Create individual gauge charts for each remote work category for 2021 with labels
+gauge(no_remote_2021_percent, min = 0, max = 100, symbol = '%', label = "No Remote")
+gauge(some_remote_2021_percent, min = 0, max = 100, symbol = '%', label = "Some Remote")
+gauge(full_remote_2021_percent, min = 0, max = 100, symbol = '%', label = "Fully Remote")
+
+# Clean up intermediate variables
+rm(no_remote_2021_percent, some_remote_2021_percent, full_remote_2021_percent)
+
+```
+
+
+Column {data-width=200}
+-----------------------------------------------------------------------
+
+### 2022
+
+```{r}
+# Filter data for the year 2022
+df_2022 <- salaries[salaries$work_year == 2022, ]
+
+# Calculate the total number of employees for 2022
+total_2022 <- nrow(df_2022)
+
+# Calculate the percentage of employees in each remote work category for 2022
+no_remote_2022_percent   <- nrow(df_2022[df_2022$remote_ratio == 0  , ]) / total_2022 * 100
+some_remote_2022_percent <- nrow(df_2022[df_2022$remote_ratio == 50 , ]) / total_2022 * 100
+full_remote_2022_percent <- nrow(df_2022[df_2022$remote_ratio == 100, ]) / total_2022 * 100
+
+# Create individual gauge charts for each remote work category for 2022 with labels
+gauge(no_remote_2022_percent, min = 0, max = 100, symbol = '%', label = "No Remote")
+gauge(some_remote_2022_percent, min = 0, max = 100, symbol = '%', label = "Some Remote")
+gauge(full_remote_2022_percent, min = 0, max = 100, symbol = '%', label = "Fully Remote")
+
+# Clean up intermediate variables
+rm(no_remote_2022_percent, some_remote_2022_percent, full_remote_2022_percent)
+
+```
+
+
+Job Growth
+===
+
+Column {data-width=700}
+-----------------------------------------------------------------------
+
+
+### 
+
+```{r}
+
+job_counts_by_year <- salaries %>%
+  group_by(work_year, job_group) %>%
+  summarize(count = n(), .groups = 'drop')
+
+p <- ggplot(job_counts_by_year, aes(x = work_year, y = count, color = job_group, group = job_group)) +
+  geom_line() +
+  labs(title = "Job Growth Over Years by Category",
+       x = "Year",
+       y = "Number of Jobs",
+       color = "Job Category") +
+  scale_x_continuous(minor_breaks = NULL) +
+  theme_minimal()
+
+ggplotly(p)
+
+```
+
+
+Sortable Data
+===
+
+Column {data-width=700}
+-----------------------------------------------------------------------
+
+###
+```{r}
+datatable(salaries[, -c(5, 6, 13)])
+```
+
