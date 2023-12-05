@@ -1,0 +1,12 @@
+body {
+    background: #1c1c2d;
+    color: #111;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Ubuntu, Cantarell, Oxygen, Roboto, Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.navbar, .sidebar, .main-container, .footer, .down-footer {
+    background-color: #1c1c2d;
+    color: #878c94;
+}

@@ -1,13 +1,12 @@
 ---
-title: "Group 2 Assignment 3"
+title: "Group 2 Assignment #3"
 output: 
   flexdashboard::flex_dashboard:
     orientation: columns
     vertical_layout: fill
     responsive: true
+    css: "style.css"
 ---
-
-
 
 
 ```{r setup, include=FALSE}
@@ -16,19 +15,18 @@ library(flexdashboard) # run the flexdashboard functionality
 library(tidyverse)
 library(plotly)
 library(DT)
-#library(ggplot)
+library(ggplot2)
 
 
+# Data Prepping
 
-#data prepping
-
-##load data
+# Load data
 salaries <- read.csv('ds_salaries_full.csv')
 
-##Sort experience levels
+# Sort experience levels
 salaries$experience_level <- factor(salaries$experience_level, levels = c("EN", "MI", "SE", "EX"), labels = c("Entry", "Middle", "Senior", "Executive"))
 
-##Add country helper labels
+# Add country helper labels
 europe <- c("AT", "BE", "BG", "CH", "CZ", "DE", "DK", "EE", "ES", "FR", "GB", "GR", "HR", "HU", "IE", "IT", "LU", "MT", "NL", "PL", "PT", "RO", "RS", "SI", "TR", "UA")
 
 salaries <- salaries %>% 
@@ -44,23 +42,41 @@ salaries <- salaries %>%
 salaries$continent_helper <- as.factor(salaries$continent_helper)
 salaries$job_group        <- as.factor(salaries$job_group)
 
+custom_theme <- function() {
+  theme_minimal(base_family = "Helvetica") +
+  theme(
+    plot.background = element_rect(fill = "#1c1c2d", color = "#1c1c2d"),
+    panel.background = element_rect(fill = "#1c1c2d"),
+    text = element_text(color = "#8584ab"),
+    axis.title = element_text(color = "#f0f0f0"),
+    axis.text = element_text(color = "#f0f0f0"),
+    legend.background = element_rect(fill = "#232238"),
+    legend.title = element_text(color = "#f0f0f0"),
+    legend.text = element_text(color = "#f0f0f0"),
+    plot.title = element_text(color = "#f0f0f0", size = 16, hjust = 0.5),
+    plot.subtitle = element_text(color = "#f0f0f0"),
+    plot.caption = element_text(color = "#878c94")
+  )
+}
+
 ```
+
 
 Salaries
 ===
 
-
 Column {data-width=500}
 -----------------------------------------------------------------------
 
-### Salary by experience
+### Salary by Experience
 
 ```{r}
 # ENtry, MId, SEnior, EXecutive
 p_experience <- ggplot(salaries, aes(x = experience_level, y = salary_in_usd)) +
-  geom_point() +
+  geom_point(color = "#98FF98") +
   labs(x = "Experience Level", y = "Salary in USD") +
-  scale_y_continuous(labels = scales::comma_format(scale = 1, big.mark = ","), limits = c(0, 650000))
+  scale_y_continuous(labels = scales::comma_format(scale = 1, big.mark = ","), limits = c(0, 650000)) +
+  custom_theme()
 
 ggplotly(p_experience)
 
@@ -70,14 +86,15 @@ ggplotly(p_experience)
 Column {data-width=500}
 -----------------------------------------------------------------------
 
-### Salary by location
+### Salary by Location
 
 ```{r}
 p_location <- ggplot(salaries[salaries$continent_helper != "Other",], aes(x = continent_helper, y = salary_in_usd), color = salary_in_usd) +
-  geom_point() +
+  geom_point(color = "#98FF98") +
   labs(x = "Continent/Country", y = "Salary in USD") +
   scale_y_continuous(labels = scales::comma_format(scale = 1, big.mark = ","), limits = c(0, 650000)) +
-  scale_color_gradient(low = "blue", high = "red")
+  scale_color_gradient(low = "blue", high = "red") + 
+  custom_theme()
 
 ggplotly(p_location)
 
@@ -91,7 +108,6 @@ Remote Work Rates
 
 Column {data-width=200}
 -----------------------------------------------------------------------
-
 
 ### 2020
 
@@ -179,7 +195,6 @@ Job Growth
 Column {data-width=700}
 -----------------------------------------------------------------------
 
-
 ### 
 
 ```{r}
@@ -195,12 +210,11 @@ p <- ggplot(job_counts_by_year, aes(x = work_year, y = count, color = job_group,
        y = "Number of Jobs",
        color = "Job Category") +
   scale_x_continuous(minor_breaks = NULL) +
-  theme_minimal()
+  custom_theme()
 
 ggplotly(p)
 
 ```
-
 
 Sortable Data
 ===
@@ -212,4 +226,3 @@ Column {data-width=700}
 ```{r}
 datatable(salaries[, -c(5, 6, 13)])
 ```
-
